@@ -1,6 +1,12 @@
 import jwt from "jsonwebtoken";
 import { model, Schema } from "mongoose";
 
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/;
+
+export const isValidPassword = (password) => {
+  return typeof password === "string" && passwordRegex.test(password) && password.length >= 8;
+};
+
 const userSchema = new Schema({
   email: {
     type: String,
@@ -30,10 +36,10 @@ const userSchema = new Schema({
     required: true,
     minLength: [8, "Password must be at least 8 characters"],
     select: false,
-    match: [
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
-      "Password must contain uppercase, lowercase, number, and special character"
-    ]
+    validate: {
+      validator: isValidPassword,
+      message: "Password must contain uppercase, lowercase, number, and special character"
+    }
   }
 }, { timestamps: true });
 

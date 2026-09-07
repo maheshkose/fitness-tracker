@@ -7,6 +7,7 @@ import {
   FieldLabel,
   FieldSet,
 } from "../ui/field";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useAppContext } from "@/Context/AppContext";
@@ -14,7 +15,7 @@ import { toast } from "sonner"
 import { useNavigate } from "react-router-dom";
 import SignUpform from "./SignUpform";
 
-const VerifyGamil = () => {
+const VerifyGamil = ({setIsSignUp}) => {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [isEmailSent, setIsEmailSent] = useState(false);
@@ -91,56 +92,75 @@ const VerifyGamil = () => {
     }
   }
   return (
-    <div>
-      <FieldSet className="w-full max-w-xs">
+    <>
+  {isGmailverified ? <SignUpform email={email} setIsSignUp={setIsSignUp} /> :
+    
+    <Card className="w-full max-w-md rounded-[1.5rem] border border-slate-200/80 bg-white/95 p-6 shadow-xl shadow-slate-200/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/85 dark:shadow-black/30">
+    <CardHeader className="border-b border-slate-200/80 pb-5 dark:border-white/10">
+      <div className="inline-flex w-fit items-center rounded-full bg-cyan-500/10 px-3 py-1 text-sm font-medium text-cyan-700 dark:text-cyan-300">
+        Verify your account
+      </div>
+      <CardTitle className="mt-3 text-2xl font-semibold">Verify Email</CardTitle>
+      <CardDescription className="text-sm text-slate-600 dark:text-slate-400">
+        Enter your email and the 6-digit code we send you.
+      </CardDescription>
+    </CardHeader>
+    <CardContent className="pt-5">
+      
+      
+        <FieldSet className="w-full">
         <FieldGroup>
           <Field>
             <FieldLabel htmlFor="email">Email</FieldLabel>
-            <Input id="email" type="email" placeholder="max.leiter@gmail.com" disabled={isEmailSent} name="email" value={email} onChange={(e)=>{setEmail(e.target.value)}} onKeyDown={handleKeyDown} />
-            <FieldDescription>
-              Enter the email address associated with your account. We will send you an OTP to verify your email.
+            <Input
+              id="email"
+              type="email"
+              placeholder="your@email.com"
+              disabled={isEmailSent}
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="rounded-xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-50"
+            />
+            <FieldDescription className="text-slate-500 dark:text-slate-400">
+              We’ll send a one-time password to verify your address.
             </FieldDescription>
-            {/* <div>
-              {isEmailSent && (
-                <div className="mt-2 text-sm text-gray-600">
-                  Didn't receive the OTP?{" "}
-                  {resendOtp ? (
-                    <button
-                      className="text-blue-500 hover:underline"
-                      onClick={() => {
-                        sendGmail();
-                        startResendOtpTimer();
-                      }}
-                    >
-                      Resend OTP
-                    </button>
-                  ) : (
-                    <span>Resend OTP in {Math.floor(resendOtpTimer / 60)}:{(resendOtpTimer % 60).toString().padStart(2, '0')}</span>
-                  )}
-                </div>
-              )}
-
-            </div> */}
           </Field>
           <Field>
             <FieldLabel htmlFor="otp">OTP</FieldLabel>
-            <Input id="otp" type="digit" placeholder="000000" disabled={!isEmailSent} name="otp" value={otp} onChange={(e)=>{setOtp(e.target.value)}} onKeyDown={handleKeyDown}/>
-            <FieldDescription>
+            <Input
+              id="otp"
+              type="text"
+              inputMode="numeric"
+              placeholder="000000"
+              disabled={!isEmailSent}
+              name="otp"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="rounded-xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-50"
+            />
+            <FieldDescription className="text-slate-500 dark:text-slate-400">
               Enter the 6-digit code sent to your email.
             </FieldDescription>
           </Field>
         </FieldGroup>
-        <Button className="bg-blue-500 text-white px-4 py-2 rounded mt-4" onClick={isEmailSent?verifyOTP:sendGmail}>
-          {isEmailSent?"Verify OTP":"Send OTP"}
+        <Button className="mt-4 w-full rounded-full bg-cyan-600 text-white hover:bg-cyan-500 dark:bg-cyan-500 dark:text-slate-950 dark:hover:bg-cyan-400" onClick={isEmailSent ? verifyOTP : sendGmail}>
+          {isEmailSent ? 'Verify OTP' : 'Send OTP'}
         </Button>
       </FieldSet>
-      {isGmailverified && (
-        <div>
-          <SignUpform email={email} />
-        </div>
-      )}
-    </div>
+      
+    </CardContent>
+    <CardFooter className="flex justify-between border-t border-slate-200/80 pt-4 dark:border-white/10">
+      <Button variant="link" className="px-0 text-cyan-700 dark:text-cyan-300" onClick={() => setIsSignUp(false)}>
+        Back to sign in
+      </Button>
+    </CardFooter>
+  </Card>}
+    </>
   );
+    
 };
 
 export default VerifyGamil;

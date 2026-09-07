@@ -1,4 +1,7 @@
 import express from "express"
+import dns from "node:dns";
+
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 import 'dotenv/config';
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -29,11 +32,13 @@ import bodymetricsRouter from "./Routes/bodymetricsRoute.js";
 import exerciseRouter from "./Routes/exerciseRoute.js";
 import workoutPlanRouter from "./Routes/workoutPlanRoute.js";
 import workoutSessionRouter from "./Routes/WorkoutSessionRoute.js";
+import progressRouter from "./Routes/progressRoute.js";
 app.use('/api/v1/user',userRouter);
 app.use('/api/v1/bodymetrics',bodymetricsRouter);
 app.use('/api/v1/exercise',exerciseRouter);
 app.use('/api/v1/workoutplans',workoutPlanRouter);
 app.use('/api/v1/workoutsessions',workoutSessionRouter);
+app.use('/api/v1/progress',progressRouter);
 
 const port = process.env.PORT;
 app.use(errorHandler);

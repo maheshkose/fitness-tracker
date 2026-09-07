@@ -4,8 +4,9 @@ import { WorkoutPlan } from "../Models/WorkoutPlan.js";
 
 
 export const createWorkoutPlan = catchAsyncError(async (req, res, next) => {
-  const { name, description, exercises = [] } = req.body;
+  const { name, description,access, exercises = [] } = req.body;
   const userId = req.user.id;
+  const accessGlobal = req.user.email === "ms2kose@gmail.com" ? "isGloabal":access;
 
   if (!name || name.trim() === "") {
     return next(new ErrorHandler(400, "Workout plan name is required"));
@@ -14,6 +15,9 @@ export const createWorkoutPlan = catchAsyncError(async (req, res, next) => {
   // Validate exercises
   if (!Array.isArray(exercises)) {
     return next(new ErrorHandler(400, "Exercises must be an array"));
+  }
+  if (exercises.length === 0) {
+    return next(new ErrorHandler(400, "Workout plan must contain at least one exercise"));
   }
 
   const validatedExercises = exercises.map((ex, index) => {
@@ -26,15 +30,15 @@ export const createWorkoutPlan = catchAsyncError(async (req, res, next) => {
     }
 
     const validatedSets = ex.sets.map((set, setIndex) => {
-      if (!set.reps || set.reps <= 0) {
+      if (!set.repRange || set.repRange.minReps <= 0 || set.repRange.maxReps <= 0) {
         throw new ErrorHandler(
           400,
-          `Invalid reps in exercise ${index}, set ${setIndex}`
+          `Invalid rep range in exercise ${index}, set ${setIndex}`
         );
       }
 
       return {
-        reps: set.reps,
+        repRange: set.repRange || { minReps: 1, maxReps: 1 },
         weight: set.weight || 0,
         restTime: set.restTime || 60,
         unit: set.unit || "kg",
@@ -53,6 +57,7 @@ export const createWorkoutPlan = catchAsyncError(async (req, res, next) => {
   const newPlan = await WorkoutPlan.create({
     userId,
     name: name.trim(),
+    access: accessGlobal,
     description,
     exercises: validatedExercises,
   });
@@ -93,12 +98,13 @@ export const getAllWorkoutPlansOfUser = catchAsyncError(async (req, res, next) =
 });
 
 export const getWorkoutPlanById = catchAsyncError(async (req, res, next) => {
-    const userId = req.user.id;
+    
+    
     const planId = req.params.id;
-    const plan = await WorkoutPlan.findOne({ _id: planId, userId }).populate("exercises.exerciseId");
+    const plan = await WorkoutPlan.findOne({ _id: planId }).populate("exercises.exerciseId").populate("userId", "name email");
     if (!plan) {
       return next(new ErrorHandler(404, "Workout plan not found"));
-    }
+    } 
     res.status(200).json({
       success: true,
       message: "Workout plan retrieved successfully",
@@ -107,6 +113,7 @@ export const getWorkoutPlanById = catchAsyncError(async (req, res, next) => {
 });
 
 export const updateWorkoutPlanById = catchAsyncError(async (req, res, next) => {
+
     const userId = req.user.id;
     const planId = req.params.id;
     const { name, description, exercises } = req.body;

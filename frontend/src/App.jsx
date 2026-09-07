@@ -18,9 +18,6 @@ const App = () => {
           <main className="w-full">
             <SidebarTrigger />
             <AppRoutes />
-            <div className="">
-              <h1 className="text-orange-500">App</h1>
-            </div>
           </main>
           <Toaster position="top-right" richColors />
         </SidebarProvider>

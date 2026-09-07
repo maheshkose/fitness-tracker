@@ -7,10 +7,10 @@ const useFormPersist = (key, initialState) => {
       const saved = localStorage.getItem(key);
       const parsed = saved ? JSON.parse(saved) : initialState;
       return {
-        ...initialState,
+        // ...initialState,
         ...parsed,
-        isCustom: parsed?.isCustom === true,
-        isPublic: parsed?.isPublic === true,
+        // isPrivate: parsed?.isPrivate === true,
+        // isPublic: parsed?.isPublic === true,
       };
     } catch (error) {
       console.error("Error loading form data", error);

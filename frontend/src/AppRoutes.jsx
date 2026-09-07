@@ -8,6 +8,8 @@ import Progress from './Pages/Progress'
 import WorkoutPlans from './Pages/WorkoutPlans'
 import WorkoutSession from './Pages/WorkoutSession'
 import ExerciseManager from './Components/MyComponents/Exercise/Exercise'
+import WorkoutPlanDetails from './Pages/WorkoutPlanDetails'
+import ExerciseDetails from './Components/MyComponents/Exercise/ExerciseDetails'
 const AppRoutes = () => {
   return (
     <Routes>
@@ -16,7 +18,10 @@ const AppRoutes = () => {
         <Route path='/Profile' element={<Profile/>}/>
         <Route path='/Progress' element={<Progress/>}/>
         <Route path='/WorkoutPlans' element={<WorkoutPlans/>}/>
+        <Route path='/WorkoutPlanDetails/:id' element={<WorkoutPlanDetails/>}/>
+        
         <Route path='/WorkoutSession' element={<WorkoutSession/>}/>
+        <Route path='/ExerciseDetails/:id' element={<ExerciseDetails/>}/>
         <Route path='/Exercise' element={<ExerciseManager/>}/>
 
     

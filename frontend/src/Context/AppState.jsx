@@ -49,12 +49,12 @@ const AppState = ({ children }) => {
       setLoading(false);
     }
   };
-  const registerUser = async (email, name, userName, password) => {
+  const registerUser = async (email, userName, password) => {
     setLoading(true);
     try {
       const res = await axios.post(
         `${apiUrl}/user/register`,
-        { email, name, userName, password },
+        { email, name: userName, userName, password },
         {
           withCredentials: true,
         },
@@ -76,6 +76,26 @@ const AppState = ({ children }) => {
       const res = await axios.post(
         `${apiUrl}/user/login`,
         data,
+        {
+          withCredentials: true,
+        },
+      );
+      console.log(res);
+
+      return res;
+    } catch (error) {
+      console.log(error);
+
+      return error.response;
+    } finally {
+      setLoading(false);
+    }
+  };
+  const getUserDetails = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(
+        `${apiUrl}/user/getUserDetails`,
         {
           withCredentials: true,
         },
@@ -432,6 +452,57 @@ const AppState = ({ children }) => {
     }
   };
 
+  //proggress api
+  const getAllWorkoutPlanUsedByUser = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${apiUrl}/progress/workoutplans/all`, {
+        withCredentials: true,
+      });
+      console.log(res);
+
+      return res;
+    } catch (error) {
+      console.log(error.response);
+      return error.response;
+    } finally {
+      setLoading(false);
+    }
+  };
+  const progressOfWorkoutPlan = async (planId) => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${apiUrl}/progress/workoutplan/${planId}`, {
+        withCredentials: true,
+      });
+      console.log(res);
+
+      return res;
+    } catch (error) {
+      console.log(error.response);
+      return error.response;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const progressOfExercise = async (exerciseId) => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${apiUrl}/progress/${exerciseId}`, {
+        withCredentials: true,
+      });
+      console.log(res);
+
+      return res;
+    } catch (error) {
+      console.log(error.response);
+      return error.response;
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <AppContext.Provider
@@ -442,27 +513,39 @@ const AppState = ({ children }) => {
         verifyGmailOtp,
         registerUser,
         loginUser,
+       getUserDetails,
         logoutUser,
-        logoutUser,
+
+
         createExercise,
         getAllExercises,
         getExerciseById,
         updateExercise,
         deleteExercise,
+
+
         createWorkoutPlan,
         getAllWorkoutPlans,
         getWorkoutPlanById,
         updateWorkoutPlanById,
         deleteWorkoutPlanById,
+
+
         addBodyMetric,
         getAllBodyMetrics,
         getBodyMetricById,
         updateBodyMetricById,
+
+
         createWorkoutSession,
         getAllWorkoutSessions,
         getWorkoutSessionById,
         updateWorkoutSessionById,
-        deleteWorkoutSessionById
+        deleteWorkoutSessionById,
+
+        progressOfExercise,
+        progressOfWorkoutPlan,
+        getAllWorkoutPlanUsedByUser
       }}
     >
       {children}

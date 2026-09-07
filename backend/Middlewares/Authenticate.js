@@ -33,5 +33,6 @@ export const isUserAuthenticated = catchAsyncError(async (req, res, next) => {
   //   exp: 1776841301
   // }
   req.user = decode;
+  console.log("req.user", req.user);
   next();
 });

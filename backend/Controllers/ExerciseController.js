@@ -15,7 +15,7 @@ export const createExercise = catchAsyncError(async (req, res, next) => {
     difficulty,
     instructions,
     tips,
-    isCustom,
+    isPrivate,
     isPublic,
     gifUrl,
     videoUrl
@@ -31,6 +31,7 @@ export const createExercise = catchAsyncError(async (req, res, next) => {
   if (!name) {
     throw new ErrorHandler(400, "Exercise name is required");
   }
+  const isSuperAdmin = req.user.email === "ms2kose@gmail.com";
 
   const exercise = await Exercise.create({
     name: name.trim(),
@@ -44,8 +45,9 @@ export const createExercise = catchAsyncError(async (req, res, next) => {
     instructions,
     tips,
     createdBy: req.user.id,
-    isCustom: isCustom || false,
+    isPrivate: isPrivate || false,
     isPublic: isPublic !== undefined ? isPublic : true,
+    isGlobal: isSuperAdmin ? true : false,
     gifUrl,
     videoUrl
   });
@@ -111,7 +113,7 @@ export const updateExercise = catchAsyncError(async (req, res, next) => {
   if (!exercise) {
     throw new ErrorHandler(404, "Exercise not found");
   }
-  if (!req.body.isCustom) {
+  if (!req.body.isPrivate) {
     return next(new ErrorHandler(403, "Only custom exercises can be updated"));
   }
   console.log(req.user.id);

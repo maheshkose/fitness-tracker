@@ -6,6 +6,9 @@ const workoutSessionSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "User",
   },
+  metaData:[
+    {type:Schema.Types.Mixed,}
+  ],
 
   workoutPlans:[ {
     type: workoutPlanSchema ,

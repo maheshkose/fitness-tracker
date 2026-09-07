@@ -6,6 +6,7 @@ const exerciseSchema = new Schema(
       type: String,
       required: true,
       trim: true,
+      unique: true,
     },
 
     description: {
@@ -77,23 +78,41 @@ const exerciseSchema = new Schema(
       default: null,
     },//added at controller
 
-    isCustom: {
+    isPrivate: {
       type: Boolean,
       default: false,
     },
 
     isPublic: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     isGlobal: {
       type: Boolean,
       default: false,
     },
 
-    gifUrl: String,
+    gifUrl: {
+      public_id:{
+        type:String,
+        default:'https://mir-s3-cdn-cf.behance.net/project_modules/max_632/2e398448645641.589d89e19a982.gif'
+      },
+      secure_url:{
+        type:String,
+        default:'https://mir-s3-cdn-cf.behance.net/project_modules/max_632/2e398448645641.589d89e19a982.gif'
+      }
+    },
 
-    videoUrl: String,
+    videoUrl: {
+      public_id:{
+        type:String,
+        default:'https://mir-s3-cdn-cf.behance.net/project_modules/max_632/2e398448645641.589d89e19a982.gif'
+      },
+      secure_url:{
+        type:String,
+        default:'https://mir-s3-cdn-cf.behance.net/project_modules/max_632/2e398448645641.589d89e19a982.gif'
+      }
+    },
   },
   { timestamps: true },
 );

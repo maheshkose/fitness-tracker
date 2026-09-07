@@ -6,7 +6,7 @@ const errorHandler = (err, req, res, next) => {
   // 🔴 MongoDB duplicate key error
   if (err.code === 11000) {
     err.statusCode = 400;
-    err.message = "Duplicate value entered";
+    err.message = `Duplicate field value entered for ${Object.keys(err.keyValue)}. Please use another value!`;
   }
 
   // 🔴 Mongoose CastError (invalid ObjectId)

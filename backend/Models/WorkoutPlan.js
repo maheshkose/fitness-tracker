@@ -12,11 +12,19 @@ export const workoutPlanSchema = new Schema(
     name: {
       type: String,
       required: true,
-      unieq: true,
+      uniqe: true,
       trim: true,
     },
 
-    description: String,
+    description: {
+      type:String,
+
+    },
+    access:{
+      type:String,
+      enum:["isPrivate","isPublic","isGloabal"],
+      default:"isPrivate"
+    },
 
     exercises: [
       {
@@ -32,11 +40,23 @@ export const workoutPlanSchema = new Schema(
         },
 
         sets: [
-          {
+          { 
             reps: {
               type: Number,
               min: 1,
-              required: true,
+              default: 1,
+            },
+            repRange: {
+              minReps: {
+                type: Number,
+                min: 1,
+                default: 1,
+              },
+              maxReps: {
+                type: Number,
+                min: 1,
+                default: 12,
+              }
             },
 
             weight: {
@@ -67,9 +87,9 @@ export const workoutPlanSchema = new Schema(
                 type: Number,
                 min: 0,
               },
-              reps: {
-                type: Number,
-                min: 1,
+              unit: {
+                type: String,
+                enum: ["kg", "lbs"],
               },
             },
              notes:{

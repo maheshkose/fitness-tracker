@@ -1,5 +1,5 @@
 import ErrorHandler from "../Middlewares/ErrorHandler.js";
-import User from "../Models/userModel.js";
+import User, { isValidPassword } from "../Models/userModel.js";
 import bcrypt from "bcryptjs"
 import catchAsyncError from "../Middlewares/catchAsyncError.js";
 import { generateCookies } from "../lib/jwt.js";
@@ -41,6 +41,9 @@ export const registerUser = catchAsyncError(async (req,res,next) => {
     if (!email || !name || !userName || !password) {
         return next(new ErrorHandler(400,'Provide All fields'))
     }
+    if (!isValidPassword(password)) {
+        return next(new ErrorHandler(400,'Password must be at least 8 characters and include uppercase, lowercase, number, and special character'))
+    }
     const hashpass = await bcrypt.hash(password,10);
 
     const user = await User.create({email,name,userName,password:hashpass});
@@ -64,7 +67,20 @@ export const loginUser = catchAsyncError(async (req,res,next) => {
     generateCookies(user,res);
 })
 export const getUserDetails = catchAsyncError(async (req,res,next) => {
-    
+    const userId = req.user.id;
+
+    if (!userId) {
+        return new ErrorHandler(404,"login first");
+    }
+    const user = await User.findById(userId);
+    if(!user){
+         return new ErrorHandler(404,"User does not exist on database");
+    }
+    res.status(200).json({
+        success:true,
+        message:"User detaild fetched",
+        user
+    })
 })
 export const logoutUser = catchAsyncError(async (req,res,next) => {
     const {UserToken} = req.cookies;
