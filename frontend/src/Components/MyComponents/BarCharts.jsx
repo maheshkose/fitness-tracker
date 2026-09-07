@@ -11,7 +11,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/Components/ui/card"
 import {
   ChartContainer,
   ChartLegend,
@@ -19,14 +19,14 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 //    ChartConfig,
-} from "@/components/ui/chart"
+} from "@/Components/ui/chart"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/Components/ui/select"
 
 export const description = "A stacked bar chart with a legend"
 

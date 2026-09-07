@@ -10,20 +10,20 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from "@/Components/ui/card"
 import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
     // type ChartConfig,
-} from "@/components/ui/chart"
+} from "@/Components/ui/chart"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/Components/ui/select"
 import { useState } from "react"
 
 
