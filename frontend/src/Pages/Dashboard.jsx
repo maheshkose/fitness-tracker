@@ -12,6 +12,8 @@ import {
   TrendingUp,
 } from 'lucide-react'
 import { Button } from '../Components/ui/button'
+import { Link } from 'react-router-dom'
+import { useAppContext } from '@/Context/AppContext'
 
 const stats = [
   {
@@ -57,10 +59,11 @@ const progressItems = [
 ]
 
 const Dashboard = () => {
+  const { userDetails} = useAppContext();
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.12),_transparent_28%),radial-gradient(circle_at_top_right,_rgba(59,130,246,0.12),_transparent_24%)] p-4 md:p-6 lg:p-8">
       <div className="mx-auto max-w-7xl space-y-6">
-        <header className="rounded-[28px] border border-border/70 bg-card/80 p-6 shadow-sm backdrop-blur md:p-8">
+        {userDetails ?<header className="rounded-[28px] border border-border/70 bg-card/80 p-6 shadow-sm backdrop-blur md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-sm font-medium text-emerald-600">
@@ -68,7 +71,7 @@ const Dashboard = () => {
                 Daily fitness hub
               </div>
               <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-                Good morning, Alex
+                Good morning, {userDetails?.name || 'Alex'}
               </h1>
               <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
                 You’re 78% toward your weekly goal. A steady session today will keep your momentum strong.
@@ -76,16 +79,49 @@ const Dashboard = () => {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <Button variant="outline" className="rounded-full">
+             <Link to="/metrics">
+               <Button variant="outline" className="rounded-full">
                 Log metrics
               </Button>
-              <Button className="rounded-full bg-emerald-500 hover:bg-emerald-600">
-                <Play size={16} className="mr-2" />
-                Start workout
-              </Button>
+             </Link>
+
+              <Link to="/WorkoutSession">
+                <Button variant="default" className="rounded-full">
+                  <Play size={16} className="mr-2" />
+                  Start workout
+                </Button>
+              </Link>
             </div>
           </div>
         </header>
+
+         :<header className="rounded-[28px] border border-border/70 bg-card/80 p-6 shadow-sm backdrop-blur md:p-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-sm font-medium text-emerald-600">
+                <Sparkles size={16} />
+                Daily fitness hub
+              </div>
+              <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+                Welcome to Fitness Tracker
+              </h1>
+              <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
+                Start your journey to a healthier lifestyle. Log your metrics, track your progress, and stay consistent with your workouts.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+             <Link to="/login">
+               <Button variant="outline" className="rounded-full px-6 py-6 text-lg font-semibold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors">
+                Login
+              </Button>
+             </Link>
+
+             </div> 
+          </div>
+        </header>}
+
+
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {stats.map((item) => {

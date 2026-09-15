@@ -6,6 +6,7 @@ import axios from "axios";
 const apiUrl = import.meta.env.VITE_Backend_Url;
 const AppState = ({ children }) => {
   const [loading, setLoading] = useState(false);
+  const [userDetails, setUserDetails] = useState(null);
 
   //user api
   const sendGmailOtp = async (email) => {
@@ -81,7 +82,9 @@ const AppState = ({ children }) => {
         },
       );
       console.log(res);
-
+      if(res.data.success){
+        await getUserDetails();
+      }
       return res;
     } catch (error) {
       console.log(error);
@@ -100,12 +103,17 @@ const AppState = ({ children }) => {
           withCredentials: true,
         },
       );
+      if(res.data.success){
+        setUserDetails(res.data.user);
+      }else{
+        setUserDetails(null);
+      }
       console.log(res);
 
       return res;
     } catch (error) {
       console.log(error);
-
+      setUserDetails(null);
       return error.response;
     } finally {
       setLoading(false);
@@ -115,14 +123,16 @@ const AppState = ({ children }) => {
   const logoutUser = async () => {
     setLoading(true);
     try {
-      const res = await axios.post(
+      const res = await axios.get(
         `${apiUrl}/user/logout`,
         {
           withCredentials: true,
         },
       );
       console.log(res);
-
+      if(res.data.success){
+        await getUserDetails();
+      }
       return res;
     } catch (error) {
       console.log(error);
@@ -507,15 +517,18 @@ const AppState = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
+        //global state
         loading,
         setLoading,
+        userDetails,
+        setUserDetails,
         sendGmailOtp,
         verifyGmailOtp,
         registerUser,
         loginUser,
        getUserDetails,
         logoutUser,
-
+        
 
         createExercise,
         getAllExercises,

@@ -4,9 +4,9 @@ import jwt from "jsonwebtoken";
 
 export const isUserAuthenticated = catchAsyncError(async (req, res, next) => {
   const userToken = req.cookies.UserToken;
-  console.log(req.cookies);
+  console.log('cookies',req.cookies);
 
-  console.log(userToken);
+  console.log('userToken',userToken);
 
   if (!userToken) {
     return next(

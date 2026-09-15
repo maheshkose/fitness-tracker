@@ -10,7 +10,10 @@ import WorkoutSession from './Pages/WorkoutSession'
 import ExerciseManager from './Components/MyComponents/Exercise/Exercise'
 import WorkoutPlanDetails from './Pages/WorkoutPlanDetails'
 import ExerciseDetails from './Components/MyComponents/Exercise/ExerciseDetails'
+import Logout from './Pages/Logout'
+import { useAppContext } from './Context/AppContext'
 const AppRoutes = () => {
+
   return (
     <Routes>
         <Route path='/' element={<Dashboard/>}/>
@@ -24,7 +27,8 @@ const AppRoutes = () => {
         <Route path='/ExerciseDetails/:id' element={<ExerciseDetails/>}/>
         <Route path='/Exercise' element={<ExerciseManager/>}/>
 
-    
+     
+        <Route path='/logout' element={<Logout/>}/>
         <Route path='/login' element={<Login/>}/>
     </Routes>
   )

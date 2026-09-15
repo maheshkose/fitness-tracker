@@ -8,7 +8,7 @@ userRouter.post('/gmailOtp', sendGamilOtp);
 userRouter.post('/verifyGmailOtp', verifyGmailOtp);
 userRouter.post('/register',registerUser);
 userRouter.post('/login',loginUser);
-userRouter.post('/logout', isUserAuthenticated, logoutUser);
+userRouter.get('/logout', isUserAuthenticated, logoutUser);
 userRouter.get('/getUserDetails',isUserAuthenticated ,getUserDetails);
 
 

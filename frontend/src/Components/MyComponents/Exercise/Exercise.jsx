@@ -21,6 +21,8 @@ const ExerciseManager = () => {
   const access = ["isPrivate", "isPublic", "isGlobal"]
   const { createExercise, getAllExercises, updateExercise, deleteExercise } = useAppContext();
   const [exercises, setExercises] = useState([]);
+  const [allExercise, setAllExercise] = useState([]);
+  const [displayedExercise, setDisplayedExercise] = useState([]);
 
   const { form, setForm, resetState } = useFormPersist('exerciseForm', {
     name: '',
@@ -157,8 +159,7 @@ const ExerciseManager = () => {
 
   // search logic
   const [searchQuery, setSearchQuery] = useState('');
-  const [allExercise, setAllExercise] = useState([]);
-  const [displayedExercise, setDisplayedExercise] = useState([]);
+  
   const searchDebounceRef = useRef(null);
   const filterDebounceRef = useRef(null);
   const filterByAccessDebounceRef = useRef(null);
@@ -443,7 +444,7 @@ const ExerciseManager = () => {
             </span>
           </div>
 
-          <div className='flex flex-row justify-between items-center gap-3'>
+          <div className='w-full flex flex-col lg:flex-row justify-between items-center gap-3'>
             <div>
               <Field orientation="horizontal">
                 <Input

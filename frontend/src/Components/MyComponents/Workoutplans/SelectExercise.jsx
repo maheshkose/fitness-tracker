@@ -47,7 +47,7 @@ const SelectExercise = ({ form, setForm, i }) => {
   }, []);
 
   const selectedExerciseId = form.exercises[i]?.exerciseId || "";
-  const filteredExercises = exercises.filter((exercise) =>
+  const filteredExercises = exercises?.filter((exercise) =>
     exercise.name.toLowerCase().includes(exerciseSearch.toLowerCase()) ||
     exercise._id === selectedExerciseId
   );
@@ -222,12 +222,17 @@ const SelectExercise = ({ form, setForm, i }) => {
       />
 
       <CommandList>
-        <CommandEmpty>
+        <CommandEmpty className='flex flex-col'>
           No exercise found.
+          <Button>
+           <Link to="/Exercise">
+            Add your Exercise
+            </Link>
+          </Button>
         </CommandEmpty>
 
         <CommandGroup>
-          {filteredExercises.map((exercise) => (
+          {filteredExercises?.map((exercise) => (
             <CommandItem
               key={exercise._id}
               value={exercise.name}

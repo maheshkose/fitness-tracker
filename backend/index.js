@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 //cors config
 app.use(cors({
-    origin:[process.env.FRONTEND_URL],
+    origin:[process.env.FRONTEND_URL, process.env.FRONTEND_URL1],
     methods:["GET","POST","PUT","DELETE"],
     credentials:true
 }));
