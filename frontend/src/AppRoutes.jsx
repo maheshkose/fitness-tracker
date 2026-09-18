@@ -11,7 +11,8 @@ import ExerciseManager from './Components/MyComponents/Exercise/Exercise'
 import WorkoutPlanDetails from './Pages/WorkoutPlanDetails'
 import ExerciseDetails from './Components/MyComponents/Exercise/ExerciseDetails'
 import Logout from './Pages/Logout'
-import { useAppContext } from './Context/AppContext'
+
+import ForgotPasswordPage from './Pages/ForgotPasswordPage'
 const AppRoutes = () => {
 
   return (
@@ -30,6 +31,7 @@ const AppRoutes = () => {
      
         <Route path='/logout' element={<Logout/>}/>
         <Route path='/login' element={<Login/>}/>
+        <Route path='/forgotPassword' element={<ForgotPasswordPage/>}/>
     </Routes>
   )
 }

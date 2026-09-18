@@ -10,7 +10,7 @@ import { Button } from "../ui/button";
 import { BsEye } from "react-icons/bs";
 import { Input } from "../ui/input";
 import { useAppContext } from "@/Context/AppContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 
@@ -26,6 +26,8 @@ const SignInform = ({ email, setIsSignUp }) => {
   });
   const [showpassword, setshowpassword] = useState(false);
   const { userName, password } = data;
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -92,6 +94,11 @@ const SignInform = ({ email, setIsSignUp }) => {
                 />
               </span>
             </Field>
+            <span>
+              <Link to={'/forgotPassword'} className="text-sm text-red-700 hover:text-red-500 dark:text-red-300 dark:hover:text-red-400">
+                Forgot Password
+              </Link>
+            </span>
           </FieldGroup>
           <Button className="mt-4 w-full rounded-full bg-cyan-600 text-white hover:bg-cyan-500 dark:bg-cyan-500 dark:text-slate-950 dark:hover:bg-cyan-400" onClick={handleSubmit}>
             Sign In

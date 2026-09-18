@@ -14,6 +14,9 @@ import {
 import { Button } from '../Components/ui/button'
 import { Link } from 'react-router-dom'
 import { useAppContext } from '@/Context/AppContext'
+import DashBoardContextProvider from '@/Context/DashBoardContext'
+import DashBoardLoggedIn from '@/Components/MyComponents/DashBoard/DashBoardLoggedIn/DashBoardLoggedIn'
+import DashBoardLoggedOut from '@/Components/MyComponents/DashBoard/DashBoard-loggedout/DashBoardLoggedOut'
 
 const stats = [
   {
@@ -59,8 +62,13 @@ const progressItems = [
 ]
 
 const Dashboard = () => {
-  const { userDetails} = useAppContext();
+  const { userDetails } = useAppContext();
   return (
+    // <DashBoardContextProvider>
+
+    //   {userDetails ? <DashBoardLoggedIn /> :
+    //     <DashBoardLoggedOut />}
+    // </DashBoardContextProvider>
     <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.12),_transparent_28%),radial-gradient(circle_at_top_right,_rgba(59,130,246,0.12),_transparent_24%)] p-4 md:p-6 lg:p-8">
       <div className="mx-auto max-w-7xl space-y-6">
         {userDetails ?<header className="rounded-[28px] border border-border/70 bg-card/80 p-6 shadow-sm backdrop-blur md:p-8">

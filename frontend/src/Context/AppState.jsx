@@ -143,6 +143,66 @@ const AppState = ({ children }) => {
     }
   };
 
+   const verifyForgotPasswordOtp = async (data) => {
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        `${apiUrl}/user/verifyForgotPasswordOtp`,
+        data,
+        {
+          withCredentials: true,
+        },
+      );
+      console.log(res);
+      return res;
+    } catch (error) {
+      console.log(error);
+
+      return error.response;
+    } finally {
+      setLoading(false);
+    }
+  };
+   const forgotPassword = async (data) => {
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        `${apiUrl}/user/forgotPassword`,
+        data,
+        {
+          withCredentials: true,
+        },
+      );
+      console.log(res);
+      return res;
+    } catch (error) {
+      console.log(error);
+
+      return error.response;
+    } finally {
+      setLoading(false);
+    }
+  };
+   const updatePassword = async (data) => {
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        `${apiUrl}/user/updatePassword`,
+        data,
+        {
+          withCredentials: true,
+        },
+      );
+      console.log(res);
+      return res;
+    } catch (error) {
+      console.log(error);
+
+      return error.response;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   //exrcise api
 
@@ -528,7 +588,9 @@ const AppState = ({ children }) => {
         loginUser,
        getUserDetails,
         logoutUser,
-        
+        forgotPassword,
+        verifyForgotPasswordOtp,
+        updatePassword,
 
         createExercise,
         getAllExercises,

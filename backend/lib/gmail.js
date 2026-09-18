@@ -68,4 +68,15 @@ const verifyOtp = async (email, otp) => {
     await Otp.deleteOne({ _id: otpData._id });
     return true;
 };
-export { sendOtpEmail,verifyOtp };
+
+const sendForgotPasswordOtp = async (email) => {
+    const otp = genarateOtp();
+    const optData = saveOtpToDatabase(email,otp);
+    const subject = 'Your OTP for Fitness Tracker forgot password';
+    const text = `Your OTP for forgot password is: ${otp}`;
+    const otpinfo = await sendEmail(email, subject, text);
+    return otpinfo;
+}
+
+
+export { sendOtpEmail,verifyOtp,sendForgotPasswordOtp };

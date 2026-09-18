@@ -3,7 +3,7 @@ import User, { isValidPassword } from "../Models/userModel.js";
 import bcrypt from "bcryptjs"
 import catchAsyncError from "../Middlewares/catchAsyncError.js";
 import { generateCookies } from "../lib/jwt.js";
-import { sendOtpEmail, verifyOtp } from "../lib/gmail.js";
+import { sendForgotPasswordOtp, sendOtpEmail, verifyOtp } from "../lib/gmail.js";
 const isProd = process.env.NODE_ENV === "production";
 
 export const sendGamilOtp = catchAsyncError(async (req,res,next) => {
@@ -23,6 +23,7 @@ export const sendGamilOtp = catchAsyncError(async (req,res,next) => {
         }
         res.status(200).json({success:true,message:"OTP sent successfully"})
 });
+
 export const verifyGmailOtp = catchAsyncError(async (req,res,next) => {
     const {email,otp} = req.body;
     if (!email || !otp) {
@@ -35,6 +36,43 @@ export const verifyGmailOtp = catchAsyncError(async (req,res,next) => {
     res.status(200).json({success:true,message:"OTP verified successfully"})
 });
 
+export const forgotPasswordOtp = catchAsyncError(async (req,res,next) => {
+    
+    const {userName} = req.body;
+
+    if (!userName) {
+        return next(new ErrorHandler(400,"Provide userName"))
+    }
+    const validUserName = await User.findOne({userName});
+    if (!validUserName) {
+        return next(new ErrorHandler(400,"Provided userName does not exist as user"))
+    }
+    console.log('validUserName',validUserName);
+
+    const email = await validUserName.email;
+    console.log('email',email);
+    const otpInfo = await sendForgotPasswordOtp(email);
+    if (!otpInfo) {
+            return  next(new ErrorHandler(500,'Failed to send OTP'))
+        }
+
+    res.status(200).json({success:true,message:"OTP sent successfully"})
+})
+export const verifyForgotPasswordOtp = catchAsyncError(async (req,res,next) => {
+    const {userName,otp} = req.body;
+    if (!userName || !otp) {
+        return next(new ErrorHandler(400,'Provide all fields'))
+    }
+    const validUserName = await User.findOne({userName});
+    if (!validUserName) {
+        return next(new ErrorHandler(400,"Provided userName does not exist as user"))
+    }
+    const verify = await verifyOtp(validUserName.email,otp);
+    if (!verify) {
+        return next(new ErrorHandler(400,'Invalid OTP'))
+    }
+    res.status(200).json({success:true,message:"OTP verified successfully"})
+});
 
 export const registerUser = catchAsyncError(async (req,res,next) => {
     const {email,name,userName,password} = req.body;
@@ -81,6 +119,18 @@ export const getUserDetails = catchAsyncError(async (req,res,next) => {
         message:"User detaild fetched",
         user
     })
+})
+export const updatePassword = catchAsyncError(async (req,res,next) => {
+   const {userName,password} = req.body;
+
+   if (!userName || !password) {
+         return next(new ErrorHandler(400,'Provide All Credentials'))
+   }
+
+   const hashPassword = await bcrypt.hash(password,10);
+    const user = await User.findOneAndUpdate({userName},{$set:{password:hashPassword}})
+
+    res.status(200).json({success:true,message:"Password updated successfully",user:{...user,password:undefined}})
 })
 export const logoutUser = catchAsyncError(async (req,res,next) => {
     const {UserToken} = req.cookies;
