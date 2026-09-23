@@ -13,6 +13,8 @@ import { useAppContext } from "@/Context/AppContext";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { Spinner } from "../ui/spinner";
+import ApiSubmit from "@/hooks/ApiSubmit";
 
 
 const SignInform = ({ email, setIsSignUp }) => {
@@ -26,8 +28,13 @@ const SignInform = ({ email, setIsSignUp }) => {
   });
   const [showpassword, setshowpassword] = useState(false);
   const { userName, password } = data;
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+
+const [apiResUi, setApiResUi] = useState({
+    message: "",
+    error: "",
+  });
+
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -40,14 +47,26 @@ const SignInform = ({ email, setIsSignUp }) => {
       toast.error("Please fill in all fields");
       return;
     }
-    
+    setLoading(true);
+    try{
     const res = await loginUser(data);
     if(res?.data?.success){
       toast.success(res.data.message);
+      setApiResUi({
+        message: res.data.message,
+        error: "",
+      });
       navigate("/");
     } else {
-      toast.error(res.response?.data?.message || "Failed to login user");
+      toast.error(res.data?.message || "Failed to login user");
+      setApiResUi({
+        message: "",
+        error: res.data?.message || "Failed to login user",
+      });
     }
+  }finally{
+    setLoading(false);
+  }
   };
   return (
     <Card className="w-full max-w-md rounded-[1.5rem] border border-slate-200/80 bg-white/95 p-6 shadow-xl shadow-slate-200/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/85 dark:shadow-black/30">
@@ -68,6 +87,7 @@ const SignInform = ({ email, setIsSignUp }) => {
               <Input
                 type="text"
                 placeholder="Enter your username"
+                required={true}
                 name="userName"
                 value={userName}
                 onChange={handleChange}
@@ -79,6 +99,7 @@ const SignInform = ({ email, setIsSignUp }) => {
               <Input
                 type={showpassword ? 'text' : 'password'}
                 placeholder="Enter your password"
+                required={true}
                 name="password"
                 value={password}
                 onChange={handleChange}
@@ -100,9 +121,27 @@ const SignInform = ({ email, setIsSignUp }) => {
               </Link>
             </span>
           </FieldGroup>
-          <Button className="mt-4 w-full rounded-full bg-cyan-600 text-white hover:bg-cyan-500 dark:bg-cyan-500 dark:text-slate-950 dark:hover:bg-cyan-400" onClick={handleSubmit}>
+          
+
+          <div className="mt-4 flex flex-col items-center justify-between">
+                <FieldDescription className="text-sm text-slate-500 dark:text-slate-400">
+                  {/* //api response message and error will be displayed here */}
+                  {apiResUi.message && <span className="text-green-500">{apiResUi.message}</span>}
+                  {apiResUi.error && <span className="text-red-500">{apiResUi.error}</span>}
+                </FieldDescription>
+                {loading ?
+                  <Button>
+                    <Spinner className="mr-2 h-4 w-4 animate-spin" />
+                    Processing your request...
+                  </Button> :
+                  <Button className="mt-4 w-full rounded-full bg-cyan-600 text-white hover:bg-cyan-500 dark:bg-cyan-500 dark:text-slate-950 dark:hover:bg-cyan-400" onClick={handleSubmit}>
             Sign In
           </Button>
+}
+
+              </div>
+             
+
         </FieldSet>
       </CardContent>
       <CardFooter className="flex justify-between border-t border-slate-200/80 pt-4 dark:border-white/10">

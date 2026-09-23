@@ -48,7 +48,7 @@ const App = () => {
           <Toaster position="top-right" richColors />
         </SidebarProvider>
       </TooltipProvider>
-      {loading && <Loding />}
+      {/* {loading && <Loding />} */}
     </Router>
   );
 };

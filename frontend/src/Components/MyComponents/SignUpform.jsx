@@ -13,6 +13,7 @@ import { useAppContext } from "@/Context/AppContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle,CardFooter } from "../ui/card";
 import { toast } from "sonner";
 
+
 const SignUpform = ({ email,setIsSignUp }) => {
     const {registerUser} =  useAppContext();
   const [data, setData] = useState({
@@ -24,6 +25,12 @@ const SignUpform = ({ email,setIsSignUp }) => {
   const [showpassword, setshowpassword] = useState(false);
   const { username, password, confirmPassword } = data;
 
+  const [loading, setLoading] = useState(false);
+  const [apiResUi, setApiResUi] = useState({
+      message: "",
+      error: "",
+    });
+
   const handleChange = (e) => {
     setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -33,20 +40,41 @@ const SignUpform = ({ email,setIsSignUp }) => {
     const {email,username,password,confirmPassword} = data;
     if (!email || !username || !password || !confirmPassword) {
       toast.error("Please fill in all fields");
+      setApiResUi({
+        message: "",
+        error: "Please fill in all fields"})
       return;
     }
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
+      setApiResUi({
+        message: "",
+        error: "Passwords do not match"
+      });
       return;
     }
-    const res = await registerUser(email,username,password);
+
+    setLoading(true);
+    try
+    {const res = await registerUser(email,username,password);
     if(res?.data?.success){
       toast.success(res.data.message);
+      setApiResUi({
+        message: res.data.message,
+        error: ""
+      });
       setIsSignUp(false);
     } else {
       toast.error(res.data?.message || "Failed to register user");
-    }
-  };
+      setApiResUi({
+        message: "",
+        error: res.data?.message || "Failed to register user"
+      });}
+      
+  }finally{
+    setLoading
+  }
+}
   return (
     <Card className="w-full max-w-md rounded-[1.5rem] border border-slate-200/80 bg-white/95 p-6 shadow-xl shadow-slate-200/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/85 dark:shadow-black/30">
       <CardHeader className="border-b border-slate-200/80 pb-5 dark:border-white/10">
@@ -77,6 +105,7 @@ const SignUpform = ({ email,setIsSignUp }) => {
               <Input
                 type="text"
                 placeholder="Choose a username"
+                required={true}
                 name="username"
                 value={username}
                 onChange={handleChange}
@@ -88,6 +117,7 @@ const SignUpform = ({ email,setIsSignUp }) => {
               <Input
                 type={showpassword ? 'text' : 'password'}
                 placeholder="Enter your password"
+                required={true}
                 name="password"
                 value={password}
                 onChange={handleChange}
@@ -108,6 +138,7 @@ const SignUpform = ({ email,setIsSignUp }) => {
               <Input
                 type={showpassword ? 'text' : 'password'}
                 placeholder="Confirm password"
+                required={true}
                 name="confirmPassword"
                 value={confirmPassword}
                 onChange={handleChange}
@@ -121,9 +152,23 @@ const SignUpform = ({ email,setIsSignUp }) => {
               </span>
             </Field>
           </FieldGroup>
-          <Button className="mt-4 w-full rounded-full bg-cyan-600 text-white hover:bg-cyan-500 dark:bg-cyan-500 dark:text-slate-950 dark:hover:bg-cyan-400" onClick={handleSubmit}>
+          
+          <div className="mt-4 flex flex-col items-center justify-between">
+                <FieldDescription className="text-sm text-slate-500 dark:text-slate-400">
+                  {/* //api response message and error will be displayed here */}
+                  {apiResUi.message && <span className="text-green-500">{apiResUi.message}</span>}
+                  {apiResUi.error && <span className="text-red-500">{apiResUi.error}</span>}
+                </FieldDescription>
+                {loading ?
+                  <Button>
+                    <Spinner className="mr-2 h-4 w-4 animate-spin" />
+                    Processing your request...
+                  </Button> :
+                  <Button className="mt-4 w-full rounded-full bg-cyan-600 text-white hover:bg-cyan-500 dark:bg-cyan-500 dark:text-slate-950 dark:hover:bg-cyan-400" onClick={handleSubmit}>
             Sign Up
-          </Button>
+          </Button>}
+
+              </div>
         </FieldSet>
       </CardContent>
       <CardFooter className="flex justify-between border-t border-slate-200/80 pt-4 dark:border-white/10">

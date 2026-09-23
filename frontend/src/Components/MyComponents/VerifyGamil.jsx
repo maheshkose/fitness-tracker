@@ -7,6 +7,7 @@ import {
   FieldLabel,
   FieldSet,
 } from "../ui/field";
+import { Spinner } from "../ui/spinner";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -15,7 +16,7 @@ import { toast } from "sonner"
 import { useNavigate } from "react-router-dom";
 import SignUpform from "./SignUpform";
 
-const VerifyGamil = ({setIsSignUp}) => {
+const VerifyGamil = ({ setIsSignUp }) => {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [isEmailSent, setIsEmailSent] = useState(false);
@@ -39,128 +40,181 @@ const VerifyGamil = ({setIsSignUp}) => {
     }, 1000);
     setResendOtpInterval(interval);
   };
-  
 
-  const {sendGmailOtp,verifyGmailOtp} =  useAppContext();
-  const sendGmail = async(e) => {
+  
+  
+  const { sendGmailOtp, verifyGmailOtp } = useAppContext();
+  const sendGmail = async (e) => {
     e.preventDefault();
     // Handle sending OTP to email logic here
     console.log('send');
-    if(!email) {
-      toast.error("Please enter an email address");  
+    if (!email) {
+      toast.error("Please enter an email address");
       return;
     }
-  
-    
-    const res = await sendGmailOtp(email);
-    if(res?.data?.success){
-      setIsEmailSent(true);
-      setTimeout(() => {
-        setResendOtp(true);
-      }, 5*60*10000);
-      toast.success(res.data.message);
-    } else {
-      toast.error(res.data?.message);
-    }
-    
-  }
-    const handleKeyDown = async(e) => {
-      if (e.key === 'Enter') {
-        if(e.target.name === "email"){
-          await sendGmail(e);
-        } else if(e.target.name === "otp"){
-          await verifyOTP(e);
-        }
-        
-      }}
 
-  const verifyOTP = async(e) => {
+    setLoading(true);
+
+    try {
+      const res = await sendGmailOtp(email);
+      if (res?.data?.success) {
+        setIsEmailSent(true);
+        setTimeout(() => {
+          setResendOtp(true);
+        }, 5 * 60 * 10000);
+        toast.success(res.data.message);
+        setApiResUi({
+          message: res.data.message,
+          error: "",
+        });
+      } else {
+        toast.error(res.data?.message);
+        setApiResUi({
+          message: "",
+          error: res.data?.message,
+        });
+      }
+    } catch (err) {
+      toast.error(err.data?.message || "Failed to send OTP");
+      setApiResUi({
+        message: "",
+        error: err.data?.message || "Failed to send OTP",
+      });
+    }
+    finally {
+      setLoading(false);
+    }
+
+  }
+  const handleKeyDown = async (e) => {
+    if (e.key === 'Enter') {
+      if (e.target.name === "email") {
+        await sendGmail(e);
+      } else if (e.target.name === "otp") {
+        await verifyOTP(e);
+      }
+
+    }
+  }
+
+  const verifyOTP = async (e) => {
     e.preventDefault();
     // Handle OTP verification logic here
-    
-    if(!otp) {
-      toast.error("Please enter the OTP");  
+
+    if (!otp) {
+      toast.error("Please enter the OTP");
       return;
     }
     console.log('verify');
-    const res = await verifyGmailOtp(email,otp);
-    if(res?.data?.success){
-      toast.success(res.data.message);
-      setisGmailverified(true);
-    } else {
-      toast.error(res.response?.data?.message || "Failed to verify OTP");
+    setLoading(true);
+    try {
+      const res = await verifyGmailOtp(email, otp);
+      if (res?.data?.success) {
+        toast.success(res.data.message);
+        setisGmailverified(true);
+        setApiResUi({
+          message: res.data.message,
+          error: "",
+        });
+      } else {
+        toast.error(res.data?.message || "Failed to verify OTP");
+        setApiResUi({
+          message: "",
+          error: res.data?.message || "Failed to verify OTP",
+        });
+      }
+    } catch (err) {
+      toast.error(err.data?.message || "Failed to verify OTP");
+      setApiResUi({
+        message: "",
+        error: err.data?.message || "Failed to verify OTP",
+      });
+    } finally {
+      setLoading(false);
     }
   }
   return (
     <>
-  {isGmailverified ? <SignUpform email={email} setIsSignUp={setIsSignUp} /> :
-    
-    <Card className="w-full max-w-md rounded-[1.5rem] border border-slate-200/80 bg-white/95 p-6 shadow-xl shadow-slate-200/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/85 dark:shadow-black/30">
-    <CardHeader className="border-b border-slate-200/80 pb-5 dark:border-white/10">
-      <div className="inline-flex w-fit items-center rounded-full bg-cyan-500/10 px-3 py-1 text-sm font-medium text-cyan-700 dark:text-cyan-300">
-        Verify your account
-      </div>
-      <CardTitle className="mt-3 text-2xl font-semibold">Verify Email</CardTitle>
-      <CardDescription className="text-sm text-slate-600 dark:text-slate-400">
-        Enter your email and the 6-digit code we send you.
-      </CardDescription>
-    </CardHeader>
-    <CardContent className="pt-5">
-      
-      
-        <FieldSet className="w-full">
-        <FieldGroup>
-          <Field>
-            <FieldLabel htmlFor="email">Email</FieldLabel>
-            <Input
-              id="email"
-              type="email"
-              placeholder="your@email.com"
-              disabled={isEmailSent}
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="rounded-xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-50"
-            />
-            <FieldDescription className="text-slate-500 dark:text-slate-400">
-              We’ll send a one-time password to verify your address.
-            </FieldDescription>
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="otp">OTP</FieldLabel>
-            <Input
-              id="otp"
-              type="text"
-              inputMode="numeric"
-              placeholder="000000"
-              disabled={!isEmailSent}
-              name="otp"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="rounded-xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-50"
-            />
-            <FieldDescription className="text-slate-500 dark:text-slate-400">
-              Enter the 6-digit code sent to your email.
-            </FieldDescription>
-          </Field>
-        </FieldGroup>
-        <Button className="mt-4 w-full rounded-full bg-cyan-600 text-white hover:bg-cyan-500 dark:bg-cyan-500 dark:text-slate-950 dark:hover:bg-cyan-400" onClick={isEmailSent ? verifyOTP : sendGmail}>
-          {isEmailSent ? 'Verify OTP' : 'Send OTP'}
-        </Button>
-      </FieldSet>
-      
-    </CardContent>
-    <CardFooter className="flex justify-between border-t border-slate-200/80 pt-4 dark:border-white/10">
-      <Button variant="link" className="px-0 text-cyan-700 dark:text-cyan-300" onClick={() => setIsSignUp(false)}>
-        Back to sign in
-      </Button>
-    </CardFooter>
-  </Card>}
+      {isGmailverified ? <SignUpform email={email} setIsSignUp={setIsSignUp} /> :
+
+        <Card className="w-full max-w-md rounded-[1.5rem] border border-slate-200/80 bg-white/95 p-6 shadow-xl shadow-slate-200/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/85 dark:shadow-black/30">
+          <CardHeader className="border-b border-slate-200/80 pb-5 dark:border-white/10">
+            <div className="inline-flex w-fit items-center rounded-full bg-cyan-500/10 px-3 py-1 text-sm font-medium text-cyan-700 dark:text-cyan-300">
+              Verify your account
+            </div>
+            <CardTitle className="mt-3 text-2xl font-semibold">Verify Email</CardTitle>
+            <CardDescription className="text-sm text-slate-600 dark:text-slate-400">
+              Enter your email and the 6-digit code we send you.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-5">
+
+
+            <FieldSet className="w-full">
+              <FieldGroup>
+                <Field>
+                  <FieldLabel htmlFor="email">Email</FieldLabel>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    disabled={isEmailSent}
+                    name="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="rounded-xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-50"
+                  />
+                  <FieldDescription className="text-slate-500 dark:text-slate-400">
+                    We’ll send a one-time password to verify your address.
+                  </FieldDescription>
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="otp">OTP</FieldLabel>
+                  <Input
+                    id="otp"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="000000"
+                    disabled={!isEmailSent}
+                    name="otp"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="rounded-xl border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-50"
+                  />
+                  <FieldDescription className="text-slate-500 dark:text-slate-400">
+                    Enter the 6-digit code sent to your email.
+                  </FieldDescription>
+                </Field>
+              </FieldGroup>
+              <div className="mt-4 flex flex-col items-center justify-between">
+                <FieldDescription className="text-sm text-slate-500 dark:text-slate-400">
+                  {/* //api response message and error will be displayed here */}
+                  {apiResUi.message && <span className="text-green-500">{apiResUi.message}</span>}
+                  {apiResUi.error && <span className="text-red-500">{apiResUi.error}</span>}
+                </FieldDescription>
+                {loading ?
+                  <Button>
+                    <Spinner className="mr-2 h-4 w-4 animate-spin" />
+                    Processing your request...
+                  </Button> : <Button className="mt-4 w-full rounded-full bg-cyan-600 text-white hover:bg-cyan-500 dark:bg-cyan-500 dark:text-slate-950 dark:hover:bg-cyan-400" onClick={isEmailSent ? verifyOTP : sendGmail}>
+                    {isEmailSent ? 'Verify OTP' : 'Send OTP'}
+                  </Button>}
+
+              </div>
+            </FieldSet>
+
+          </CardContent>
+          <CardFooter className="flex justify-between border-t border-slate-200/80 pt-4 dark:border-white/10">
+            <Button variant="link" className="px-0 text-cyan-700 dark:text-cyan-300" onClick={() => setIsSignUp(false)}>
+              Back to sign in
+            </Button>
+          </CardFooter>
+        </Card>}
     </>
   );
-    
+
 };
 
 export default VerifyGamil;
