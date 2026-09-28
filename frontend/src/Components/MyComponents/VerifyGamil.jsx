@@ -41,7 +41,11 @@ const VerifyGamil = ({ setIsSignUp }) => {
     setResendOtpInterval(interval);
   };
 
-  
+    const [loading, setLoading] = useState(false);
+    const [apiResUi, setApiResUi] = useState({
+        message: "",
+        error: "",
+      });
   
   const { sendGmailOtp, verifyGmailOtp } = useAppContext();
   const sendGmail = async (e) => {
