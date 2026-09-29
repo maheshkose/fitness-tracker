@@ -6,141 +6,145 @@ import { generateCookies } from "../lib/jwt.js";
 import { sendForgotPasswordOtp, sendOtpEmail, verifyOtp } from "../lib/gmail.js";
 const isProd = process.env.NODE_ENV === "production";
 
-export const sendGamilOtp = catchAsyncError(async (req,res,next) => {
-        const {email} = req.body;
-        if (!email) {
-            const e = new ErrorHandler(400,'Provide gmail field');
-            console.log('e',e);
-            
-            const err = await next(e);
-            console.log("error",err);
-            
-            return err;
-        }
-        const otpinfo = await sendOtpEmail(email);
-        if (!otpinfo) {
-            return  next(new ErrorHandler(500,'Failed to send OTP'))
-        }
-        res.status(200).json({success:true,message:"OTP sent successfully"})
-});
-
-export const verifyGmailOtp = catchAsyncError(async (req,res,next) => {
-    const {email,otp} = req.body;
-    if (!email || !otp) {
-        return next(new ErrorHandler(400,'Provide all fields'))
+export const sendGamilOtp = catchAsyncError(async (req, res, next) => {
+    const { email } = req.body;
+    if (!email) {
+        return next(new ErrorHandler(400, 'Provide gmail field'));
     }
-    const verify = await verifyOtp(email,otp);
-    if (!verify) {
-        return next(new ErrorHandler(400,'Invalid OTP'))
-    }
-    res.status(200).json({success:true,message:"OTP verified successfully"})
-});
-
-export const forgotPasswordOtp = catchAsyncError(async (req,res,next) => {
     
-    const {userName} = req.body;
+        const isUserExist = await User.findOne({ email });
+        if (isUserExist) {
+            return next(new ErrorHandler(400, 'Provided gmail already exist as user'));
+        }
+    
+    const otpinfo = await sendOtpEmail(email);
+    console.log('otpInfo', otpinfo);
+
+
+    if (!otpinfo) {
+        return next(new ErrorHandler(500, 'Failed to send OTP'))
+    }
+    res.status(200).json({ success: true, message: "OTP sent successfully. Please check your gmail. If otp not received, please try again." })
+});
+
+export const verifyGmailOtp = catchAsyncError(async (req, res, next) => {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+        return next(new ErrorHandler(400, 'Provide all fields'))
+    }
+    const verify = await verifyOtp(email, otp);
+    if (!verify) {
+        return next(new ErrorHandler(400, 'Invalid OTP'))
+    }
+    res.status(200).json({ success: true, message: "OTP verified successfully" })
+});
+
+export const forgotPasswordOtp = catchAsyncError(async (req, res, next) => {
+
+    const { userName } = req.body;
 
     if (!userName) {
-        return next(new ErrorHandler(400,"Provide userName"))
+        return next(new ErrorHandler(400, "Provide userName"))
     }
-    const validUserName = await User.findOne({userName});
+    const validUserName = await User.findOne({ userName });
     if (!validUserName) {
-        return next(new ErrorHandler(400,"Provided userName does not exist as user"))
+        return next(new ErrorHandler(400, "Provided userName does not exist as user"))
     }
-    console.log('validUserName',validUserName);
+    console.log('validUserName', validUserName);
 
     const email = await validUserName.email;
-    console.log('email',email);
+    console.log('email', email);
     const otpInfo = await sendForgotPasswordOtp(email);
+    console.log('otpInfo', otpInfo);
     if (!otpInfo) {
-            return  next(new ErrorHandler(500,'Failed to send OTP'))
-        }
+        return next(new ErrorHandler(500, 'Failed to send OTP'))
+    }
 
-    res.status(200).json({success:true,message:"OTP sent successfully"})
+    res.status(200).json({ success: true, message: "OTP sent successfully" })
 })
-export const verifyForgotPasswordOtp = catchAsyncError(async (req,res,next) => {
-    const {userName,otp} = req.body;
+export const verifyForgotPasswordOtp = catchAsyncError(async (req, res, next) => {
+    const { userName, otp } = req.body;
     if (!userName || !otp) {
-        return next(new ErrorHandler(400,'Provide all fields'))
+        return next(new ErrorHandler(400, 'Provide all fields'))
     }
-    const validUserName = await User.findOne({userName});
+    const validUserName = await User.findOne({ userName });
     if (!validUserName) {
-        return next(new ErrorHandler(400,"Provided userName does not exist as user"))
+        return next(new ErrorHandler(400, "Provided userName does not exist as user"))
     }
-    const verify = await verifyOtp(validUserName.email,otp);
+    const verify = await verifyOtp(validUserName.email, otp);
     if (!verify) {
-        return next(new ErrorHandler(400,'Invalid OTP'))
+        return next(new ErrorHandler(400, 'Invalid OTP'))
     }
-    res.status(200).json({success:true,message:"OTP verified successfully"})
+    res.status(200).json({ success: true, message: "OTP verified successfully" })
 });
 
-export const registerUser = catchAsyncError(async (req,res,next) => {
-    const {email,name,userName,password} = req.body;
+export const registerUser = catchAsyncError(async (req, res, next) => {
+    const { email, name, userName, password } = req.body;
     if (!email || !name || !userName || !password) {
-        return next(new ErrorHandler(400,'Provide All fields'))
+        return next(new ErrorHandler(400, 'Provide All fields'))
     }
     if (!isValidPassword(password)) {
-        return next(new ErrorHandler(400,'Password must be at least 8 characters and include uppercase, lowercase, number, and special character'))
+        return next(new ErrorHandler(400, 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character'))
     }
-    const hashpass = await bcrypt.hash(password,10);
+    const hashpass = await bcrypt.hash(password, 10);
 
-    const user = await User.create({email,name,userName,password:hashpass});
-    res.status(200).json({success:true,message:"User registered succesfully",user:{...user._doc,password:undefined}})
+    const user = await User.create({ email, name, userName, password: hashpass });
+    res.status(200).json({ success: true, message: "User registered succesfully", user: { ...user._doc, password: undefined } })
 })
-export const loginUser = catchAsyncError(async (req,res,next) => {
-    const {email,userName,password} = req.body;
+export const loginUser = catchAsyncError(async (req, res, next) => {
+    const { email, userName, password } = req.body;
     if ((!email && !userName) || !password) {
-        return next(new ErrorHandler(400,'Provide All fields'))
+        return next(new ErrorHandler(400, 'Provide All fields'))
     }
-    const user = await User.findOne({$or:[{userName}, {email}]}).select("+password");
+    const user = await User.findOne({ $or: [{ userName }, { email }] }).select("+password");
     if (!user) {
-         return next(new ErrorHandler(400,"Please provide valid credentials"))
+        return next(new ErrorHandler(400, "Please provide valid credentials"))
     }
-    const decode = await bcrypt.compare(password,user.password);
+    const decode = await bcrypt.compare(password, user.password);
     if (!decode) {
-         return next(new ErrorHandler(400,"Please provide valid credentials"))
+        return next(new ErrorHandler(400, "Please provide valid credentials"))
     }
-    
-    
-    generateCookies(user,res);
+
+
+    generateCookies(user, res);
 })
-export const getUserDetails = catchAsyncError(async (req,res,next) => {
+export const getUserDetails = catchAsyncError(async (req, res, next) => {
     const userId = req.user.id;
 
     if (!userId) {
-        return new ErrorHandler(404,"login first");
+        return new ErrorHandler(404, "login first");
     }
     const user = await User.findById(userId);
-    if(!user){
-         return new ErrorHandler(404,"User does not exist on database");
+    if (!user) {
+        return new ErrorHandler(404, "User does not exist on database");
     }
     res.status(200).json({
-        success:true,
-        message:"User detaild fetched",
+        success: true,
+        message: "User detaild fetched",
         user
     })
 })
-export const updatePassword = catchAsyncError(async (req,res,next) => {
-   const {userName,password} = req.body;
+export const updatePassword = catchAsyncError(async (req, res, next) => {
+    const { userName, password } = req.body;
 
-   if (!userName || !password) {
-         return next(new ErrorHandler(400,'Provide All Credentials'))
-   }
-
-   const hashPassword = await bcrypt.hash(password,10);
-    const user = await User.findOneAndUpdate({userName},{$set:{password:hashPassword}})
-
-    res.status(200).json({success:true,message:"Password updated successfully",user:{...user,password:undefined}})
-})
-export const logoutUser = catchAsyncError(async (req,res,next) => {
-    const {UserToken} = req.cookies;
-    if (!UserToken) {
-        return next(new ErrorHandler(400,'User not logged in'))
+    if (!userName || !password) {
+        return next(new ErrorHandler(400, 'Provide All Credentials'))
     }
-    res.clearCookie("UserToken",{
-        httpOnly:true,
+
+    const hashPassword = await bcrypt.hash(password, 10);
+    const user = await User.findOneAndUpdate({ userName }, { $set: { password: hashPassword } })
+
+    res.status(200).json({ success: true, message: "Password updated successfully", user: { ...user, password: undefined } })
+})
+export const logoutUser = catchAsyncError(async (req, res, next) => {
+    const { UserToken } = req.cookies;
+    if (!UserToken) {
+        return next(new ErrorHandler(400, 'User not logged in'))
+    }
+    res.clearCookie("UserToken", {
+        httpOnly: true,
         secure: isProd,
         sameSite: isProd ? "none" : "lax",
     });
-    res.status(200).json({success:true,message:"User logged out successfully"})
+    res.status(200).json({ success: true, message: "User logged out successfully" })
 })
