@@ -2,6 +2,7 @@ import express from "express"
 import dns from "node:dns";
 
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
+dns.setDefaultResultOrder("ipv4first");
 import 'dotenv/config';
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -21,6 +22,28 @@ app.use(cors({
 app.use(cookieParser());
 //database connection
 connectDb();
+
+//render lookup 
+
+
+dns.lookup("smtp.gmail.com", { all: true }, (err, addresses) => {
+  console.log("SMTP DNS:", {
+    err,
+    addresses,
+  });
+});
+
+dns.lookup(
+  "smtp.gmail.com",
+  { family: 4 },
+  (err, address, family) => {
+    console.log("SMTP IPv4:", {
+      err,
+      address,
+      family,
+    });
+  }
+);
 
 app.get('/',(req,res)=>{
     res.send('<h1>Welcome to home route</h1>');
